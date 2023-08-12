@@ -4,8 +4,8 @@ export default function LoginPage() {
   return (
     <div className="flex h-screen bg-gray-100">
       <div className="m-auto p-8 flex">
-        <div className="w-1/4 pr-4 border-r flex align-middle mr-10">
-          <Image src="./next.svg" height={250} width={250} alt='logo'/>
+        <div className="w-1/4 pr-4 border-r flex mr-10 items-center">
+          <Image src="./logo.svg" height={100} width={200} alt='logo' className='h-52'/>
         </div>
         <div className="w-3/4 p-20 bg-white rounded-md shadow-lg">
           <h2 className="text-2xl font-semibold text-gray-800 mb-4">Login</h2>

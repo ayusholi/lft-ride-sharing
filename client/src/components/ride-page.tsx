@@ -7,13 +7,14 @@ import MapComponent from './map';
 import SearchBox from './searchbox';
 
 interface Location {
-  lat: string,
-  lng: string,
+  lat: number,
+  lng: number,
+  description: string,
 }
 
 const RidePage = () => {
-  const [pickupLocation, setPickupLocation] = useState<Location>({lat: "", lng: ""});
-  const [destination, setDestination] = useState<Location>({lat: "", lng: ""});
+  const [pickupLocation, setPickupLocation] = useState<Location>({lat: 0, lng: 0, description: ""});
+  const [destination, setDestination] = useState<Location>({lat: 0, lng: 0, description: ""});
   const [viewport, setViewport] = useState({
     width: '100%',
     height: 400,
@@ -45,24 +46,21 @@ const RidePage = () => {
   return (
     <div className="p-4">
       <h1 className="text-2xl mb-4">Find a Driver</h1>
-      <MapComponent />
-      <div className='flex flex-row justify-around'>
+      <MapComponent markers={markers} />
+      <div className='flex flex-row justify-around mb-4'>
         <div>
-          <SearchBox value={`${pickupLocation.lat},${pickupLocation.lng}`} onChange={handlePickupChange} onSelect={(value) => handleSelect(value, setPickupLocation)} />
+          <SearchBox value={pickupLocation.description} onChange={handlePickupChange} onSelect={(value) => handleSelect(value, setPickupLocation)} />
         </div>
         <div>
-          <SearchBox value={`${destination.lat},${destination.lng}`} onChange={handleDestinationChange} onSelect={(value) => handleSelect(value, setDestination)} />
+          <SearchBox value={destination.description} onChange={handleDestinationChange} onSelect={(value) => handleSelect(value, setDestination)} />
         </div>
-        <div>
-          {/* <MapComponent viewport={viewport} markers={markers} /> */}
-        </div>
-        <button
-          className="bg-teal-500 hover:bg-teal-600 text-white font-semibold py-2 px-4 rounded-lg focus:outline-none w-full"
-          onClick={handleFindDriver}
-        >
-          Find a Driver
-        </button>
       </div>
+      <button
+        className="bg-teal-500 hover:bg-teal-600 text-white font-semibold py-2 px-4 rounded-lg focus:outline-none w-full"
+        onClick={handleFindDriver}
+      >
+        Find a Driver
+      </button>
     </div>
   );
 };

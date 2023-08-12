@@ -1,6 +1,6 @@
 import React from 'react';
-import PlacesAutocomplete from 'react-places-autocomplete';
-
+// import PlacesAutocomplete from 'react-places-autocomplete';
+import { AddressAutofill } from '@mapbox/search-js-react';
 interface SearchBoxProps {
   value: string;
   onChange: (value: string) => void;
@@ -9,22 +9,11 @@ interface SearchBoxProps {
 
 const SearchBox: React.FC<SearchBoxProps> = ({ value, onChange, onSelect }) => {
   return (
-    <PlacesAutocomplete value={value} onChange={onChange} onSelect={onSelect}>
-      {({ getInputProps, suggestions, getSuggestionItemProps, loading }) => (
-        <div>
-          <input {...getInputProps({ placeholder: 'Enter location...' })} />
-          <div>
-            {loading && <div>Loading...</div>}
-            {suggestions.map((suggestion, index) => (
-              // @ts-ignore
-              <div key={index} {...getSuggestionItemProps(suggestion)}>
-                {suggestion.description}
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-    </PlacesAutocomplete>
+    <>
+      <AddressAutofill accessToken="pk.eyJ1IjoiYXl1c2gtb2xpIiwiYSI6ImNsbDY0MWZzdTBmNjgzbHM4dGhkeWcxaWQifQ.ggzHGHtCLzraNlyoHBaF4g">
+        <input name="address" placeholder="Address" type="text" autoComplete="address-line1"/>
+      </AddressAutofill>
+    </>
   );
 };
 
