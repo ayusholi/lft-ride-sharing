@@ -1,5 +1,5 @@
 // user.entity.ts
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, Timestamp, CreateDateColumn } from 'typeorm';
 
 @Entity()
 export class User {
@@ -15,7 +15,28 @@ export class User {
   @Column()
   password: string;
 
-  @Column()
-  contactNumber = Number;
-  // Other user fields
+  @Column({
+    nullable: true,
+  })
+  profile_image_link: string;
+
+  @CreateDateColumn({
+    nullable: true,
+  })
+  email_verified_at: Timestamp;
+
+  @Column({
+    nullable: true,
+  })
+  contact_number: number;
+
+  @CreateDateColumn({
+    nullable: true,
+  })
+  created_at: Timestamp;
+
+  @CreateDateColumn({
+    nullable: true,
+  })
+  updated_at: Timestamp;
 }

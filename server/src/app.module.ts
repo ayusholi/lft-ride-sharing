@@ -6,9 +6,12 @@ import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { AuthService } from './auth/auth.service';
 import { JwtService } from '@nestjs/jwt';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { config } from 'ormconfig';
+import { RideModule } from './ride/ride.module';
 
 @Module({
-  imports: [PassportModule, AuthModule, UsersModule],
+  imports: [TypeOrmModule.forRoot(config), PassportModule, AuthModule, UsersModule, RideModule],
   controllers: [AppController],
   providers: [AppService, AuthService, JwtService],
 })
