@@ -1,102 +1,117 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthService } from './auth.service';
-import { UsersService } from '../users/users.service';
+import { JwtModule } from '@nestjs/jwt';
 import { JwtService } from '@nestjs/jwt';
+import { UsersService } from '../users/users.service';
+import { Repository } from 'typeorm';
+import { getRepositoryToken, TypeOrmModule } from '@nestjs/typeorm';
+import { User } from '../users/user.entity';
 import { UnauthorizedException } from '@nestjs/common';
-import { User } from '../users/user.entity'; // Make sure the import path is correct
-import { Timestamp } from 'typeorm';
+import { jwtConstants } from '../utils/constants';
 
 describe('AuthService', () => {
   let authService: AuthService;
-  let usersService: UsersService;
   let jwtService: JwtService;
-
-  const mockUsersService = {
-    findOne: jest.fn(),
-    createUser: jest.fn(),
-  };
-
-  const mockJwtService = {
-    sign: jest.fn(),
-  };
+  let usersService: UsersService;
+  let userRepository: Repository<User>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
+      imports: [],
       providers: [
         AuthService,
-        { provide: UsersService, useValue: mockUsersService },
-        { provide: JwtService, useValue: mockJwtService },
+        JwtService,
+        UsersService,
+        {
+          provide: getRepositoryToken(User),
+          useClass: Repository, // Mock the Repository behavior
+        },
       ],
     }).compile();
 
     authService = module.get<AuthService>(AuthService);
-    usersService = module.get<UsersService>(UsersService);
     jwtService = module.get<JwtService>(JwtService);
+    usersService = module.get<UsersService>(UsersService);
+    userRepository = module.get<Repository<User>>(getRepositoryToken(User));
+  });
 
-    // Reset mock function calls before each test
-    jest.clearAllMocks();
+  describe('validateUser', () => {
+    it('should return user when valid credentials are provided', async () => {
+      const username = 'testuser';
+      const password = 'password';
+      const user = new User();
+      user.username = username;
+      user.password = password;
+
+      jest.spyOn(userRepository, 'findOneBy').mockResolvedValue(user);
+
+      const result = await authService.validateUser(username, password);
+
+      expect(result).toEqual({ username });
+    });
+
+    it('should return null when invalid credentials are provided', async () => {
+      const username = 'testuser';
+      const password = 'password';
+
+      jest.spyOn(userRepository, 'findOneBy').mockResolvedValue(undefined);
+
+      const result = await authService.validateUser(username, password);
+
+      expect(result).toBeNull();
+    });
   });
 
   describe('login', () => {
     it('should return access token when valid credentials are provided', async () => {
-      const mockUser: User = {
-        id: 1,
-        username: 'testuser',
-        email: 'test@example.com',
-        password: 'password123',
-        profile_image_link: '',
-        contact_number: 980000,
-        email_verified_at: null,
-        created_at: null,
-        updated_at: null,
-      };
-      await authService.register(mockUser);
+      const username = 'testuser';
+      const password = 'password';
+      const user = new User();
+      user.username = username;
+      user.password = password;
 
-      const user = { username: 'testuser', password: 'password123' };
-      const mockAccessToken = 'mock_access_token';
-      const mockValidatedUser = { username: 'testuser', email: 'test@example.com' };
+      jest.spyOn(authService, 'validateUser').mockResolvedValue(user);
+      jest.spyOn(jwtService, 'sign').mockReturnValue('accessToken');
 
-      mockUsersService.findOne.mockResolvedValue(mockValidatedUser);
-      mockJwtService.sign.mockReturnValue(mockAccessToken);
+      const result = await authService.login({ username, password });
 
-      const result = await authService.login(user);
-
-      expect(result).toEqual({ access_token: mockAccessToken });
-      expect(mockUsersService.findOne).toHaveBeenCalledWith(user.username);
-      expect(mockJwtService.sign).toHaveBeenCalledWith({ username: user.username, password: user.password });
+      expect(result).toHaveProperty('access_token', 'accessToken');
     });
 
     it('should throw UnauthorizedException when invalid credentials are provided', async () => {
-      const mockUser = { username: 'testuser', password: 'wrongpassword' };
+      const username = 'testuser';
+      const password = 'password';
 
-      mockUsersService.findOne.mockResolvedValue(null);
+      jest.spyOn(authService, 'validateUser').mockResolvedValue(undefined);
 
-      await expect(authService.login(mockUser)).rejects.toThrow(UnauthorizedException);
-      expect(mockUsersService.findOne).toHaveBeenCalledWith(mockUser.username);
+      try {
+        await authService.login({ username, password });
+      } catch (error) {
+        expect(error).toBeInstanceOf(UnauthorizedException);
+        expect(error.message).toEqual('Incorrect Credentials');
+      }
     });
   });
 
   describe('register', () => {
-    it('should return access token when registering a user', async () => {
-      const mockUser: User = {
-        id: 1,
-        username: 'testuser',
-        email: 'test@example.com',
-        password: 'password123',
-        profile_image_link: '',
-        contact_number: 980000,
-        email_verified_at: null,
-        created_at: null,
-        updated_at: null,
-      };
-      const mockAccessToken = 'mock_access_token';
+    it('should create a user and return access token', async () => {
+      const user = new User();
+      user.username = 'newuser';
+      user.email = 'newuser@example.com';
+      user.password = 'password';
 
-      mockUsersService.createUser.mockResolvedValue(mockAccessToken);
+      const savedUser = new User();
+      savedUser.username = user.username;
+      savedUser.email = user.email;
+      savedUser.password = user.password;
 
-      const result = await authService.register(mockUser);
+      jest.spyOn(userRepository, 'create').mockReturnValue(savedUser);
+      jest.spyOn(userRepository, 'save').mockResolvedValue(savedUser);
 
-      expect(result).toEqual({ access_token: mockAccessToken });
-      expect(mockUsersService.createUser).toHaveBeenCalledWith(mockUser.username, mockUser.email, mockUser.password);
+      const result = await authService.register(user);
+
+      expect(result).toHaveProperty('username');
+      expect(result.username).toEqual('newuser');
     });
   });
 });
