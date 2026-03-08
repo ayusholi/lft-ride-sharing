@@ -2,5 +2,5 @@
 
 ## [Unreleased]
 
-- move constants to dedicated config file
-- Updated: 2026-03-08T13:31:25.997Z
+- use dependency injection pattern
+- Updated: 2026-03-08T13:36:58.626Z
