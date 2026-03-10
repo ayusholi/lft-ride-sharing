@@ -2,5 +2,5 @@
 
 ## [Unreleased]
 
-- use dependency injection pattern
-- Updated: 2026-03-08T13:36:58.626Z
+- correct sorting algorithm for edge cases
+- Updated: 2026-03-10T14:42:57.824Z
