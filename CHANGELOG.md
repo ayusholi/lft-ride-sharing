@@ -2,5 +2,5 @@
 
 ## [Unreleased]
 
-- format code according to style guide
-- Build: 2026-03-10T14:42:57.824Z
+- improve code examples in docs
+- Updated: 2026-03-12T13:00:00.810Z
