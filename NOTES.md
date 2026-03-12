@@ -1,7 +1,7 @@
 # Notes
 
-Last updated: 2026-03-12T13:00:00.810Z
+Session: 2026-03-12T13:00:00.810Z
 
-## Progress
+## Summary
 
-- add environment variable support
+- add contributing guidelines
