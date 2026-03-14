@@ -1,7 +1,7 @@
 # Notes
 
-Last updated: 2026-03-14T13:00:01.050Z
+Session: 2026-03-14T13:00:01.050Z
 
-## Progress
+## Summary
 
-- add utility functions for data processing
+- add setup and installation guide
